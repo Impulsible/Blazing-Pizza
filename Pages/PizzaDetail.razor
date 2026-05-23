@@ -1,0 +1,78 @@
+@page "/pizza/{id:int}"
+@using BlazingPizza.Data
+@inject PizzaService PizzaService
+@inject NavigationManager NavigationManager
+
+<div style="max-width: 800px; margin: 50px auto; padding: 20px;">
+    @if (pizza == null)
+    {
+        <div style="text-align: center; padding: 60px;">
+            <p>Loading pizza details...</p>
+        </div>
+    }
+    else
+    {
+        <div style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div style="height: 300px; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 120px;">🍕</span>
+            </div>
+            <div style="padding: 30px;">
+                <h1 style="color: #e67e22; margin-bottom: 10px;">@pizza.Name</h1>
+                <p style="color: #666; font-size: 16px; line-height: 1.6;">@pizza.Description</p>
+                
+                <div style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 10px;">
+                    <h3>Price: <span style="color: #e67e22;">@pizza.GetFormattedPrice()</span></h3>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button class="btn btn-warning" style="background: #e67e22; border: none; padding: 12px 30px; color: white; border-radius: 8px; cursor: pointer;" @onclick="AddToCart">
+                        🛒 Add to Cart
+                    </button>
+                    <button class="btn btn-secondary" style="background: #6c757d; border: none; padding: 12px 30px; color: white; border-radius: 8px; cursor: pointer;" @onclick="GoBack">
+                        ← Back to Menu
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    
+    private PizzaSpecial pizza;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadPizza();
+    }
+
+    private async Task LoadPizza()
+    {
+        try
+        {
+            var allPizzas = await PizzaService.GetPizzasAsync();
+            pizza = allPizzas?.FirstOrDefault(p => p.Id == Id);
+            
+            if (pizza == null)
+            {
+                NavigationManager.NavigateTo("/specials");
+            }
+        }
+        catch
+        {
+            pizza = null;
+        }
+    }
+
+    private void AddToCart()
+    {
+        Console.WriteLine($"Added {pizza?.Name} to cart");
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/specials");
+    }
+}

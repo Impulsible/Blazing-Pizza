@@ -1,6 +1,91 @@
 @inherits LayoutComponentBase
 
-<div class="content">
-    @Body
+<div class="main-layout">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>🍕 Blazing Pizza</h1>
+            <p>🔥 Delivered blazing fast!</p>
+        </div>
+        
+        <div class="content-body">
+            @Body
+        </div>
+        
+        <!-- Footer with Name and Country -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2026 Blazing Pizza</p>
+                <p>Created by <strong>OSUAGWU PRINCE HENRY</strong> from <strong>NIGERIA</strong></p>
+                <p class="small">All pizzas made with love 🍕 | Delivered blazing fast 🔥</p>
+            </div>
+        </footer>
+    </div>
 </div>
 
+<style>
+    .main-layout {
+        display: flex;
+        min-height: 100vh;
+    }
+    
+    .sidebar {
+        width: 280px;
+        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        overflow-y: auto;
+    }
+    
+    .main-content {
+        flex: 1;
+        margin-left: 280px;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+    
+    .header {
+        background: linear-gradient(135deg, #e67e22, #d35400);
+        color: white;
+        padding: 20px 30px;
+    }
+    
+    .header h1 {
+        margin: 0;
+        font-size: 28px;
+    }
+    
+    .header p {
+        margin: 5px 0 0;
+        opacity: 0.9;
+    }
+    
+    .content-body {
+        flex: 1;
+        padding: 20px;
+    }
+    
+    .footer {
+        background-color: #2c3e50;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        margin-top: auto;
+    }
+    
+    .footer-content p {
+        margin: 5px 0;
+    }
+    
+    .footer-content .small {
+        font-size: 12px;
+        opacity: 0.7;
+    }
+</style>

@@ -1,0 +1,79 @@
+@inherits LayoutComponentBase
+
+<div class="checkout-layout">
+    <div class="checkout-header">
+        <a href="/" class="logo-link">
+            <h1>🍕 Blazing Pizza</h1>
+            <p>Checkout</p>
+        </a>
+    </div>
+    
+    <div class="checkout-body">
+        @Body
+    </div>
+    
+    <footer class="checkout-footer">
+        <p>Created by <strong>OSUAGWU PRINCE HENRY</strong> from <strong>NIGERIA</strong></p>
+        <p class="small">© 2026 Blazing Pizza</p>
+        <a href="/">← Back to Home</a>
+    </footer>
+</div>
+
+<style>
+    .checkout-layout {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .checkout-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e67e22;
+    }
+    
+    .logo-link {
+        text-decoration: none;
+    }
+    
+    .checkout-header h1 {
+        color: #e67e22;
+        margin: 0;
+    }
+    
+    .checkout-header p {
+        color: #666;
+        margin: 5px 0 0;
+    }
+    
+    .checkout-body {
+        flex: 1;
+    }
+    
+    .checkout-footer {
+        text-align: center;
+        margin-top: 50px;
+        padding: 20px;
+        border-top: 1px solid #ddd;
+    }
+    
+    .checkout-footer p {
+        margin: 5px 0;
+        color: #666;
+    }
+    
+    .checkout-footer .small {
+        font-size: 12px;
+    }
+    
+    .checkout-footer a {
+        color: #e67e22;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 10px;
+    }
+</style>

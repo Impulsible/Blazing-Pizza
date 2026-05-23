@@ -1,0 +1,145 @@
+@page "/myorders/{orderId:int}"
+@inject NavigationManager NavigationManager
+
+<h2 style="color: #e67e22;">📦 Order Details</h2>
+
+@if (currentOrder == null)
+{
+    <p>Loading order details...</p>
+}
+else if (!orderFound)
+{
+    <div style="text-align: center; padding: 50px; background: #f9f9f9; border-radius: 10px;">
+        <h3>Order not found</h3>
+        <p>We're sorry but this order no longer exists.</p>
+        <a href="/myorders" style="background: #e67e22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
+            View My Orders
+        </a>
+    </div>
+}
+else
+{
+    <div style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <div style="background: #f9f9f9; padding: 15px; border-bottom: 1px solid #ddd;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0;">Order #@currentOrder.Id</h3>
+                <p style="margin: 0;">Status: <strong style="color: #e67e22;">@currentOrder.Status</strong></p>
+            </div>
+            <p style="margin: 10px 0 0;">Placed on: @currentOrder.Date</p>
+        </div>
+        
+        <div style="padding: 20px;">
+            <h4>Items:</h4>
+            @foreach (var item in currentOrder.Items)
+            {
+                <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <strong>🍕 @item.Name</strong>
+                            <div style="font-size: 12px; color: #666;">@item.Description</div>
+                        </div>
+                        <div>
+                            <span style="color: #e67e22; font-weight: bold;">₦@item.Price.ToString("N2")</span>
+                        </div>
+                    </div>
+                </div>
+            }
+            
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee; text-align: right;">
+                <h3>Total: <span style="color: #e67e22;">₦@currentOrder.Total.ToString("N2")</span></h3>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="/myorders" style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            ← Back to My Orders
+        </a>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int OrderId { get; set; }
+
+    private OrderDetailData currentOrder;
+    private bool orderFound = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Task.Delay(10);
+        LoadOrder();
+    }
+
+    private void LoadOrder()
+    {
+        var sampleOrders = new Dictionary<int, OrderDetailData>
+        {
+            { 1001, new OrderDetailData 
+                { 
+                    Id = 1001, 
+                    Date = DateTime.Now.AddDays(-2).ToString("MMMM dd, yyyy"), 
+                    Status = "Delivered", 
+                    Total = 27998.00m,
+                    Items = new List<OrderItemData>
+                    {
+                        new OrderItemData { Name = "Margherita", Description = "Fresh mozzarella, basil", Price = 12999.00m },
+                        new OrderItemData { Name = "Pepperoni", Description = "Classic pepperoni", Price = 14999.00m }
+                    }
+                } 
+            },
+            { 1002, new OrderDetailData 
+                { 
+                    Id = 1002, 
+                    Date = DateTime.Now.AddDays(-1).ToString("MMMM dd, yyyy"), 
+                    Status = "On the Way", 
+                    Total = 44997.00m,
+                    Items = new List<OrderItemData>
+                    {
+                        new OrderItemData { Name = "Margherita", Description = "Fresh mozzarella, basil", Price = 12999.00m },
+                        new OrderItemData { Name = "Pepperoni", Description = "Classic pepperoni", Price = 14999.00m },
+                        new OrderItemData { Name = "Veggie Delight", Description = "Fresh vegetables", Price = 16999.00m }
+                    }
+                } 
+            },
+            { 1003, new OrderDetailData 
+                { 
+                    Id = 1003, 
+                    Date = DateTime.Now.ToString("MMMM dd, yyyy"), 
+                    Status = "Preparing", 
+                    Total = 14999.00m,
+                    Items = new List<OrderItemData>
+                    {
+                        new OrderItemData { Name = "Pepperoni", Description = "Classic pepperoni", Price = 14999.00m }
+                    }
+                } 
+            }
+        };
+
+        if (sampleOrders.ContainsKey(OrderId))
+        {
+            currentOrder = sampleOrders[OrderId];
+            orderFound = true;
+        }
+        else
+        {
+            orderFound = false;
+        }
+    }
+
+    private class OrderDetailData
+    {
+        public int Id { get; set; }
+        public string Date { get; set; } = "";
+        public string Status { get; set; } = "";
+        public decimal Total { get; set; }
+        public List<OrderItemData> Items { get; set; } = new();
+    }
+
+    private class OrderItemData
+    {
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public decimal Price { get; set; }
+    }
+}

@@ -1,4 +1,67 @@
 @page "/"
+@using BlazingPizza.Data
+@inject PizzaService PizzaService
+@inject NavigationManager NavigationManager
 
-<h1>Blazing Pizzas</h1>
-		
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <h1 style="text-align: center; color: #e67e22; margin-bottom: 30px;">🍕 Welcome to Blazing Pizza</h1>
+
+    @if (specials == null)
+    {
+        <p style="text-align: center;">Loading our delicious pizzas...</p>
+    }
+    else if (specials.Count == 0)
+    {
+        <p style="text-align: center;">No pizzas available.</p>
+    }
+    else
+    {
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            @foreach (var pizza in specials.Take(6))
+            {
+                var nairaPrice = pizza.BasePrice * 1500;
+                
+                <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.3s;"
+                     @onclick="() => GoToPizza(pizza.Id)">
+                    <div style="height: 200px; background-image: url('@pizza.ImageUrl'); background-size: cover; background-position: center;">
+                    </div>
+                    <div style="padding: 15px;">
+                        <h3>@pizza.Name</h3>
+                        <p style="color: #666;">@pizza.Description</p>
+                        <p style="font-size: 24px; color: #e67e22; font-weight: bold;">
+                            ₦@(nairaPrice.ToString("N0"))
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .pizza-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+</style>
+
+@code {
+    private List<PizzaSpecial> specials = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            specials = await PizzaService.GetPizzasAsync();
+        }
+        catch
+        {
+            specials = new List<PizzaSpecial>();
+        }
+    }
+
+    private void GoToPizza(int id)
+    {
+        NavigationManager.NavigateTo($"/pizza/{id}");
+    }
+}

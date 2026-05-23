@@ -1,0 +1,116 @@
+@page "/myorders"
+@inject NavigationManager NavigationManager
+
+<h2 style="color: #e67e22;">📋 My Orders</h2>
+
+@if (orders == null)
+{
+    <p>Loading your orders...</p>
+}
+else if (orders.Count == 0)
+{
+    <div style="text-align: center; padding: 50px; background: #f9f9f9; border-radius: 10px;">
+        <p>You haven't placed any orders yet.</p>
+        <a href="/specials" style="background: #e67e22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
+            Order some pizza!
+        </a>
+    </div>
+}
+else
+{
+    <div class="orders-list">
+        @foreach (var order in orders)
+        {
+            <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background: white;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <h5 style="margin: 0 0 5px 0;">Order #@order.Id</h5>
+                        <p style="margin: 5px 0;">Date: @order.Date</p>
+                        <p style="margin: 5px 0;">Items: @order.ItemCount | Total: <strong>₦@order.Total.ToString("N2")</strong></p>
+                    </div>
+                    <div>
+                        <span style="background: @GetStatusColor(order.Status); color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px;">
+                            @order.Status
+                        </span>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" @onclick="() => ViewOrder(order.Id)" style="background: #27ae60; border: none; padding: 8px 20px; color: white; border-radius: 5px; cursor: pointer;">
+                            Track &gt;
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .orders-list {
+        margin-top: 20px;
+    }
+</style>
+
+@code {
+    private List<Order> orders = new();
+
+    protected override void OnInitialized()
+    {
+        LoadSampleOrders();
+    }
+
+    private void LoadSampleOrders()
+    {
+        orders = new List<Order>
+        {
+            new Order 
+            { 
+                Id = 1001, 
+                Date = DateTime.Now.AddDays(-2).ToString("MMMM dd, yyyy"), 
+                ItemCount = 2, 
+                Total = 27998.00m, 
+                Status = "Delivered" 
+            },
+            new Order 
+            { 
+                Id = 1002, 
+                Date = DateTime.Now.AddDays(-1).ToString("MMMM dd, yyyy"), 
+                ItemCount = 3, 
+                Total = 44997.00m, 
+                Status = "On the Way" 
+            },
+            new Order 
+            { 
+                Id = 1003, 
+                Date = DateTime.Now.ToString("MMMM dd, yyyy"), 
+                ItemCount = 1, 
+                Total = 14999.00m, 
+                Status = "Preparing" 
+            }
+        };
+    }
+
+    private string GetStatusColor(string status)
+    {
+        return status switch
+        {
+            "Delivered" => "#27ae60",
+            "On the Way" => "#e67e22",
+            "Preparing" => "#3498db",
+            _ => "#666"
+        };
+    }
+
+    private void ViewOrder(int orderId)
+    {
+        NavigationManager.NavigateTo($"/myorders/{orderId}");
+    }
+
+    private class Order
+    {
+        public int Id { get; set; }
+        public string Date { get; set; } = "";
+        public int ItemCount { get; set; }
+        public decimal Total { get; set; }
+        public string Status { get; set; } = "";
+    }
+}

@@ -1,0 +1,61 @@
+<div class="nav-menu">
+    <div class="brand">
+        <h3>🍕 Blazing Pizza</h3>
+    </div>
+    
+    <nav>
+        <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+            🏠 Home
+        </NavLink>
+        <NavLink class="nav-link" href="/specials">
+            🍕 Menu
+        </NavLink>
+        <NavLink class="nav-link" href="/checkout">
+            🛒 Cart
+        </NavLink>
+        <NavLink class="nav-link" href="/myorders">
+            📋 My Orders
+        </NavLink>
+    </nav>
+</div>
+
+<style>
+    .nav-menu {
+        padding: 20px 0;
+    }
+    
+    .brand {
+        text-align: center;
+        padding: 20px;
+        border-bottom: 2px solid #e67e22;
+        margin-bottom: 20px;
+    }
+    
+    .brand h3 {
+        color: #e67e22;
+        margin: 0;
+    }
+    
+    .nav-link {
+        display: block;
+        padding: 12px 25px;
+        color: #ecf0f1;
+        text-decoration: none;
+        font-size: 16px;
+        transition: all 0.3s;
+        margin: 5px 0;
+    }
+    
+    .nav-link:hover {
+        background-color: #e67e22;
+        color: white;
+        padding-left: 35px;
+    }
+    
+    .nav-link.active {
+        background-color: #e67e22;
+        color: white;
+        font-weight: bold;
+        border-left: 4px solid white;
+    }
+</style>
