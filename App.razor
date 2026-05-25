@@ -1,16 +1,14 @@
-﻿@using BlazingPizza.Shared
-
-<Router AppAssembly="typeof(Program).Assembly">
+﻿<Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+        <RouteView RouteData="routeData" DefaultLayout="typeof(Shared.MainLayout)" />
     </Found>
     <NotFound>
-        <MainLayout>
+        <LayoutView Layout="typeof(Shared.MainLayout)">
             <div style="text-align: center; padding: 50px;">
                 <h1>404 - Page Not Found</h1>
-                <p>The page you're looking for doesn't exist.</p>
-                <a href="/" style="background: #e67e22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Go Home</a>
+                <p>Sorry, there's nothing at this address.</p>
+                <a href="/">Go Home</a>
             </div>
-        </MainLayout>
+        </LayoutView>
     </NotFound>
 </Router>

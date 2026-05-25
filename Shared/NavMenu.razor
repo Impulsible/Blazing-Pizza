@@ -1,61 +1,18 @@
-<div class="nav-menu">
-    <div class="brand">
-        <h3>🍕 Blazing Pizza</h3>
+<nav style="background: #c0392b; padding: 15px 30px; display: flex; gap: 40px; align-items: baseline;">
+    <div style="font-size: 24px; font-weight: bold; color: white; letter-spacing: 1px;">BLAZING PIZZA</div>
+    <div style="display: flex; gap: 30px;">
+        <NavLink href="" Match="NavLinkMatch.All" style="color: white; text-decoration: none; font-size: 16px; padding: 5px 0;">
+            GET PIZZA
+        </NavLink>
+        <NavLink href="myorders" style="color: white; text-decoration: none; font-size: 16px; padding: 5px 0;">
+            MY ORDERS
+        </NavLink>
     </div>
-    
-    <nav>
-        <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
-            🏠 Home
-        </NavLink>
-        <NavLink class="nav-link" href="/specials">
-            🍕 Menu
-        </NavLink>
-        <NavLink class="nav-link" href="/checkout">
-            🛒 Cart
-        </NavLink>
-        <NavLink class="nav-link" href="/myorders">
-            📋 My Orders
-        </NavLink>
-    </nav>
-</div>
+</nav>
 
 <style>
-    .nav-menu {
-        padding: 20px 0;
-    }
-    
-    .brand {
-        text-align: center;
-        padding: 20px;
-        border-bottom: 2px solid #e67e22;
-        margin-bottom: 20px;
-    }
-    
-    .brand h3 {
-        color: #e67e22;
-        margin: 0;
-    }
-    
-    .nav-link {
-        display: block;
-        padding: 12px 25px;
-        color: #ecf0f1;
-        text-decoration: none;
-        font-size: 16px;
-        transition: all 0.3s;
-        margin: 5px 0;
-    }
-    
-    .nav-link:hover {
-        background-color: #e67e22;
-        color: white;
-        padding-left: 35px;
-    }
-    
-    .nav-link.active {
-        background-color: #e67e22;
-        color: white;
+    .active {
+        border-bottom: 2px solid white;
         font-weight: bold;
-        border-left: 4px solid white;
     }
 </style>

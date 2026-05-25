@@ -1,70 +1,62 @@
 @page "/checkout"
-@layout CheckoutLayout
-@inject HttpClient HttpClient
+@using BlazingPizza.Services
+@inject OrderState OrderState
 @inject NavigationManager NavigationManager
 
-<h2 style="color: #e67e22; margin-bottom: 20px;">🛒 Review Your Order</h2>
-
-@if (cartItems.Count == 0)
-{
-    <div style="text-align: center; padding: 50px; background: #f9f9f9; border-radius: 10px;">
-        <p>Your cart is empty!</p>
-        <a href="/specials" style="background: #e67e22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
-            Browse Menu
-        </a>
-    </div>
-}
-else
-{
-    <div style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        @foreach (var item in cartItems)
+<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <div style="background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h2 style="color: #e67e22; margin-bottom: 20px;">📋 Review Your Order</h2>
+        
+        @if (Order.Pizzas.Count == 0)
         {
-            <div style="border-bottom: 1px solid #eee; padding: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>🍕 @item.Name</strong>
-                        <div style="font-size: 12px; color: #666;">@item.Description</div>
-                    </div>
-                    <div>
-                        <span style="color: #e67e22; font-weight: bold;">₦@item.Price.ToString("N2")</span>
-                    </div>
-                </div>
+            <div style="text-align: center; padding: 50px;">
+                <p>Your cart is empty!</p>
+                <button @onclick="GoToMenu" style="background: #e67e22; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    Browse Menu
+                </button>
             </div>
         }
-        
-        <div style="background: #f9f9f9; padding: 20px; text-align: right;">
-            <h3>Total: <span style="color: #e67e22;">₦@GetTotal().ToString("N2")</span></h3>
-        </div>
+        else
+        {
+            <div style="margin-bottom: 20px;">
+                @foreach (var pizza in Order.Pizzas)
+                {
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div>
+                            <strong>@(pizza.Size)" @pizza.Special.Name</strong>
+                        </div>
+                        <div style="color: #e67e22; font-weight: bold;">
+                            ₦@((pizza.GetTotalPrice() * 1500).ToString("N0"))
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            <div style="border-top: 2px solid #ddd; padding-top: 15px; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold;">
+                    <span>Total:</span>
+                    <span style="color: #e67e22;">₦@((Order.GetTotalPrice() * 1500).ToString("N0"))</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <button @onclick="PlaceOrder" disabled="@isSubmitting"
+                        style="background: #e67e22; color: white; border: none; padding: 15px 30px; 
+                               border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px;">
+                    @(isSubmitting ? "Processing..." : "PLACE ORDER →")
+                </button>
+            </div>
+        }
     </div>
-    
-    <div style="margin-top: 30px; text-align: center;">
-        <button class="btn btn-warning" @onclick="PlaceOrder" style="background: #e67e22; border: none; padding: 12px 40px; font-size: 18px; color: white; border-radius: 8px; cursor: pointer;">
-            📦 Place Order
-        </button>
-    </div>
-}
+</div>
 
 @code {
-    private List<CartItem> cartItems = new();
     private bool isSubmitting = false;
+    private Order Order => OrderState.Order;
 
-    protected override void OnInitialized()
+    private void GoToMenu()
     {
-        LoadCart();
-    }
-
-    private void LoadCart()
-    {
-        cartItems = new List<CartItem>
-        {
-            new CartItem { Name = "Margherita", Description = "Fresh mozzarella, basil", Price = 12999.00m },
-            new CartItem { Name = "Pepperoni", Description = "Classic pepperoni", Price = 14999.00m }
-        };
-    }
-
-    private decimal GetTotal()
-    {
-        return cartItems.Sum(x => x.Price);
+        NavigationManager.NavigateTo("/");
     }
 
     private async Task PlaceOrder()
@@ -73,22 +65,18 @@ else
         
         isSubmitting = true;
         
-        try
-        {
-            await Task.Delay(1000);
-            cartItems.Clear();
-            NavigationManager.NavigateTo("/myorders");
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
-    }
-
-    private class CartItem
-    {
-        public string Name { get; set; } = "";
-        public string Description { get; set; } = "";
-        public decimal Price { get; set; }
+        // Simulate API call
+        await Task.Delay(1000);
+        
+        // In a real app, you would save to database here
+        Console.WriteLine($"Order placed with {Order.Pizzas.Count} pizzas");
+        
+        // Reset the order
+        OrderState.ResetOrder();
+        
+        // Redirect to My Orders page
+        NavigationManager.NavigateTo("/myorders");
+        
+        isSubmitting = false;
     }
 }

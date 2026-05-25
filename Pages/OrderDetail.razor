@@ -1,73 +1,183 @@
 @page "/myorders/{orderId:int}"
 @inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
 
-<h2 style="color: #e67e22;">📦 Order Details</h2>
-
-@if (currentOrder == null)
-{
-    <p>Loading order details...</p>
-}
-else if (!orderFound)
-{
-    <div style="text-align: center; padding: 50px; background: #f9f9f9; border-radius: 10px;">
-        <h3>Order not found</h3>
-        <p>We're sorry but this order no longer exists.</p>
-        <a href="/myorders" style="background: #e67e22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
-            View My Orders
-        </a>
-    </div>
-}
-else
-{
-    <div style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        <div style="background: #f9f9f9; padding: 15px; border-bottom: 1px solid #ddd;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin: 0;">Order #@currentOrder.Id</h3>
-                <p style="margin: 0;">Status: <strong style="color: #e67e22;">@currentOrder.Status</strong></p>
-            </div>
-            <p style="margin: 10px 0 0;">Placed on: @currentOrder.Date</p>
+<div class="order-detail-container">
+    @if (invalidOrder)
+    {
+        <div class="order-not-found">
+            <h2>Order not found</h2>
+            <p>We're sorry but this order no longer exists.</p>
+            <button class="btn-back" @onclick="GoToMyOrders">← Back to My Orders</button>
         </div>
-        
-        <div style="padding: 20px;">
-            <h4>Items:</h4>
-            @foreach (var item in currentOrder.Items)
-            {
-                <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <div>
-                            <strong>🍕 @item.Name</strong>
-                            <div style="font-size: 12px; color: #666;">@item.Description</div>
-                        </div>
-                        <div>
-                            <span style="color: #e67e22; font-weight: bold;">₦@item.Price.ToString("N2")</span>
-                        </div>
-                    </div>
-                </div>
-            }
+    }
+    else if (currentOrder == null)
+    {
+        <div class="order-loading">
+            <p>Loading order details...</p>
+        </div>
+    }
+    else
+    {
+        <div class="order-detail-card">
+            <div class="order-detail-header">
+                <h2>Order placed @currentOrder.Date</h2>
+                <span class="order-status-badge @GetStatusClass(currentOrder.Status)">
+                    @currentOrder.Status
+                </span>
+            </div>
             
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee; text-align: right;">
-                <h3>Total: <span style="color: #e67e22;">₦@currentOrder.Total.ToString("N2")</span></h3>
+            <div class="order-detail-body">
+                <h3>Items:</h3>
+                <div class="order-items-list">
+                    @foreach (var pizza in currentOrder.Items)
+                    {
+                        <div class="order-detail-item">
+                            <div class="item-name">
+                                <strong>@pizza.Name</strong>
+                            </div>
+                            <div class="item-price">
+                                ₦@pizza.Price.ToString("N0")
+                            </div>
+                        </div>
+                    }
+                </div>
+                
+                <div class="order-detail-total">
+                    <span>Total:</span>
+                    <strong>₦@currentOrder.Total.ToString("N0")</strong>
+                </div>
             </div>
+            
+            <button class="btn-back" @onclick="GoToMyOrders">← Back to My Orders</button>
         </div>
-    </div>
+    }
+</div>
+
+<style>
+    .order-detail-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+    }
     
-    <div style="margin-top: 20px;">
-        <a href="/myorders" style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
-            ← Back to My Orders
-        </a>
-    </div>
-}
+    .order-detail-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .order-detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 20px;
+    }
+    
+    .order-detail-header h2 {
+        margin: 0;
+        font-size: 20px;
+        color: #1a1a2e;
+    }
+    
+    .order-status-badge {
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    
+    .status-delivered {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-progress {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-preparing {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .order-detail-body h3 {
+        margin-bottom: 15px;
+        color: #1a1a2e;
+    }
+    
+    .order-items-list {
+        margin-bottom: 20px;
+    }
+    
+    .order-detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .item-name {
+        font-size: 15px;
+    }
+    
+    .item-price {
+        font-weight: bold;
+        color: #e67e22;
+    }
+    
+    .order-detail-total {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-top: 2px solid #e9ecef;
+        font-size: 18px;
+        margin-top: 10px;
+    }
+    
+    .btn-back {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #5a6268;
+    }
+    
+    .order-not-found {
+        text-align: center;
+        padding: 60px;
+        background: white;
+        border-radius: 16px;
+    }
+    
+    .order-loading {
+        text-align: center;
+        padding: 60px;
+    }
+</style>
 
 @code {
-    [Parameter]
+    [Parameter] 
     public int OrderId { get; set; }
 
     private OrderDetailData currentOrder;
-    private bool orderFound = true;
+    private bool invalidOrder = false;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        await Task.Delay(10);
         LoadOrder();
     }
 
@@ -80,11 +190,11 @@ else
                     Id = 1001, 
                     Date = DateTime.Now.AddDays(-2).ToString("MMMM dd, yyyy"), 
                     Status = "Delivered", 
-                    Total = 27998.00m,
+                    Total = 27998,
                     Items = new List<OrderItemData>
                     {
-                        new OrderItemData { Name = "Margherita", Description = "Fresh mozzarella, basil", Price = 12999.00m },
-                        new OrderItemData { Name = "Pepperoni", Description = "Classic pepperoni", Price = 14999.00m }
+                        new OrderItemData { Name = "12\" Classic Pepperoni", Price = 14985 },
+                        new OrderItemData { Name = "12\" Basic Cheese Pizza", Price = 13013 }
                     }
                 } 
             },
@@ -93,12 +203,12 @@ else
                     Id = 1002, 
                     Date = DateTime.Now.AddDays(-1).ToString("MMMM dd, yyyy"), 
                     Status = "On the Way", 
-                    Total = 44997.00m,
+                    Total = 44997,
                     Items = new List<OrderItemData>
                     {
-                        new OrderItemData { Name = "Margherita", Description = "Fresh mozzarella, basil", Price = 12999.00m },
-                        new OrderItemData { Name = "Pepperoni", Description = "Classic pepperoni", Price = 14999.00m },
-                        new OrderItemData { Name = "Veggie Delight", Description = "Fresh vegetables", Price = 16999.00m }
+                        new OrderItemData { Name = "12\" Buffalo Chicken", Price = 19125 },
+                        new OrderItemData { Name = "12\" The Baconatorizor", Price = 17985 },
+                        new OrderItemData { Name = "12\" Classic Pepperoni", Price = 14985 }
                     }
                 } 
             },
@@ -107,10 +217,10 @@ else
                     Id = 1003, 
                     Date = DateTime.Now.ToString("MMMM dd, yyyy"), 
                     Status = "Preparing", 
-                    Total = 14999.00m,
+                    Total = 14985,
                     Items = new List<OrderItemData>
                     {
-                        new OrderItemData { Name = "Pepperoni", Description = "Classic pepperoni", Price = 14999.00m }
+                        new OrderItemData { Name = "12\" Classic Pepperoni", Price = 14985 }
                     }
                 } 
             }
@@ -119,12 +229,29 @@ else
         if (sampleOrders.ContainsKey(OrderId))
         {
             currentOrder = sampleOrders[OrderId];
-            orderFound = true;
+            invalidOrder = false;
         }
         else
         {
-            orderFound = false;
+            currentOrder = null;
+            invalidOrder = true;
         }
+    }
+
+    private string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "Delivered" => "status-delivered",
+            "On the Way" => "status-progress",
+            "Preparing" => "status-preparing",
+            _ => ""
+        };
+    }
+
+    private void GoToMyOrders()
+    {
+        NavigationManager.NavigateTo("/myorders");
     }
 
     private class OrderDetailData
@@ -139,7 +266,6 @@ else
     private class OrderItemData
     {
         public string Name { get; set; } = "";
-        public string Description { get; set; } = "";
         public decimal Price { get; set; }
     }
 }

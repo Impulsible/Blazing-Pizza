@@ -1,0 +1,52 @@
+@using BlazingPizza.Services
+@inject OrderState OrderState
+@inject NavigationManager NavigationManager
+
+<div class="order-sidebar-content">
+    <h2>YOUR ORDER</h2>
+    
+    @if (order.Pizzas.Count == 0)
+    {
+        <div class="empty-order">
+            <p>Choose a pizza<br>to get started</p>
+        </div>
+    }
+    else
+    {
+        <div class="order-items-list">
+            @foreach (var pizza in order.Pizzas)
+            {
+                <div class="order-item-row">
+                    <div class="order-item-name">@(pizza.Size)" @pizza.Special.Name</div>
+                    <div class="order-item-price">
+                        ₦@((pizza.GetTotalPrice() * 1500).ToString("N0"))
+                        <button class="remove-btn" @onclick:stopPropagation="true" @onclick="() => RemoveFromOrder(pizza)">✕</button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    
+    <div class="order-total-row">
+        <span class="total-text">TOTAL:</span>
+        <span class="total-amount">₦@((order.GetTotalPrice() * 1500).ToString("N0"))</span>
+    </div>
+    
+    <button class="checkout-order-btn" @onclick="GoToCheckout">
+        ORDER →
+    </button>
+</div>
+
+@code {
+    private Order order => OrderState.Order;
+
+    private void RemoveFromOrder(Pizza pizza)
+    {
+        OrderState.Order.Pizzas.Remove(pizza);
+    }
+
+    private void GoToCheckout()
+    {
+        NavigationManager.NavigateTo("/checkout");
+    }
+}

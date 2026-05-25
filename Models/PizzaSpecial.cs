@@ -1,4 +1,4 @@
-namespace BlazingPizza.Data;
+namespace BlazingPizza;
 
 public class PizzaSpecial
 {
@@ -8,9 +8,8 @@ public class PizzaSpecial
     public decimal BasePrice { get; set; }
     public string ImageUrl { get; set; } = "";
     
-    // Format price in Nigerian Naira (₦)
     public string GetFormattedPrice()
     {
-        return $"₦{BasePrice:N2}";
+        return BasePrice.ToString("0.00");
     }
 }

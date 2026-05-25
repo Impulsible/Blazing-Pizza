@@ -1,36 +1,29 @@
 @page "/"
 @using BlazingPizza.Data
+@using BlazingPizza.Services
 @inject PizzaService PizzaService
+@inject OrderState OrderState
 @inject NavigationManager NavigationManager
 
-<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-    <h1 style="text-align: center; color: #e67e22; margin-bottom: 30px;">🍕 Welcome to Blazing Pizza</h1>
-
+<!-- Pizza Grid - 3 Columns -->
+<div class="pizza-grid-container">
     @if (specials == null)
     {
-        <p style="text-align: center;">Loading our delicious pizzas...</p>
-    }
-    else if (specials.Count == 0)
-    {
-        <p style="text-align: center;">No pizzas available.</p>
+        <p>Loading pizzas...</p>
     }
     else
     {
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-            @foreach (var pizza in specials.Take(6))
+        <div class="pizza-grid-3cols">
+            @foreach (var pizza in specials)
             {
-                var nairaPrice = pizza.BasePrice * 1500;
-                
-                <div style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.3s;"
-                     @onclick="() => GoToPizza(pizza.Id)">
-                    <div style="height: 200px; background-image: url('@pizza.ImageUrl'); background-size: cover; background-position: center;">
+                <div class="pizza-card" @onclick="() => AddToOrder(pizza)">
+                    <div class="pizza-image">
+                        <img src="@pizza.ImageUrl" alt="@pizza.Name" />
                     </div>
-                    <div style="padding: 15px;">
-                        <h3>@pizza.Name</h3>
-                        <p style="color: #666;">@pizza.Description</p>
-                        <p style="font-size: 24px; color: #e67e22; font-weight: bold;">
-                            ₦@(nairaPrice.ToString("N0"))
-                        </p>
+                    <div class="pizza-info">
+                        <div class="pizza-name">@pizza.Name.ToUpper()</div>
+                        <div class="pizza-description">@pizza.Description</div>
+                        <div class="pizza-price">₦@((pizza.BasePrice * 1500).ToString("N0"))</div>
                     </div>
                 </div>
             }
@@ -38,30 +31,24 @@
     }
 </div>
 
-<style>
-    .pizza-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-    }
-</style>
-
 @code {
     private List<PizzaSpecial> specials = new();
+    private Order order => OrderState.Order;
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            specials = await PizzaService.GetPizzasAsync();
-        }
-        catch
-        {
-            specials = new List<PizzaSpecial>();
-        }
+        specials = await PizzaService.GetPizzasAsync();
     }
 
-    private void GoToPizza(int id)
+    private void AddToOrder(PizzaSpecial special)
     {
-        NavigationManager.NavigateTo($"/pizza/{id}");
+        var pizza = new Pizza
+        {
+            Special = special,
+            SpecialId = special.Id,
+            Size = 12,
+            Toppings = new List<PizzaTopping>()
+        };
+        OrderState.Order.Pizzas.Add(pizza);
     }
 }

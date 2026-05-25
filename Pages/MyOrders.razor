@@ -1,111 +1,209 @@
 @page "/myorders"
 @inject NavigationManager NavigationManager
 
-<h2 style="color: #e67e22;">📋 My Orders</h2>
-
-@if (orders == null)
-{
-    <p>Loading your orders...</p>
-}
-else if (orders.Count == 0)
-{
-    <div style="text-align: center; padding: 50px; background: #f9f9f9; border-radius: 10px;">
-        <p>You haven't placed any orders yet.</p>
-        <a href="/specials" style="background: #e67e22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
-            Order some pizza!
-        </a>
-    </div>
-}
-else
-{
-    <div class="orders-list">
-        @foreach (var order in orders)
-        {
-            <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background: white;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                    <div>
-                        <h5 style="margin: 0 0 5px 0;">Order #@order.Id</h5>
-                        <p style="margin: 5px 0;">Date: @order.Date</p>
-                        <p style="margin: 5px 0;">Items: @order.ItemCount | Total: <strong>₦@order.Total.ToString("N2")</strong></p>
-                    </div>
-                    <div>
-                        <span style="background: @GetStatusColor(order.Status); color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px;">
+<div class="myorders-container">
+    <h1 class="myorders-title">📋 My Orders</h1>
+    
+    @if (orders.Count == 0)
+    {
+        <div class="empty-orders">
+            <p style="font-size: 18px; margin-bottom: 15px;">You haven't placed any orders yet.</p>
+            <button class="track-btn" @onclick="GoToMenu">🍕 Order Some Pizza</button>
+        </div>
+    }
+    else
+    {
+        <div class="orders-list">
+            @foreach (var order in orders)
+            {
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <span class="order-id">Order #@order.Id</span>
+                            <div class="order-date">📅 @order.Date</div>
+                        </div>
+                        <div class="order-status @GetStatusClass(order.Status)">
                             @order.Status
-                        </span>
+                        </div>
                     </div>
-                    <div>
-                        <button class="btn btn-success" @onclick="() => ViewOrder(order.Id)" style="background: #27ae60; border: none; padding: 8px 20px; color: white; border-radius: 5px; cursor: pointer;">
-                            Track &gt;
+                    
+                    <div class="order-details">
+                        <div class="order-items-count">
+                            🍕 Items: <strong>@order.ItemCount</strong>
+                        </div>
+                        <div class="order-total-price">
+                            Total: ₦@order.Total.ToString("N0")
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: right;">
+                        <!-- This is the important link - uses route parameter -->
+                        <button class="track-btn" @onclick="() => ViewOrder(order.Id)">
+                            Track Order →
                         </button>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
-}
+            }
+        </div>
+    }
+</div>
 
 <style>
+    .myorders-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px;
+    }
+    
+    .myorders-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #e67e22;
+    }
+    
     .orders-list {
-        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .order-card {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border: 1px solid #f0f0f0;
+        transition: all 0.3s;
+    }
+    
+    .order-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .order-id {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1a1a2e;
+    }
+    
+    .order-date {
+        color: #6c757d;
+        font-size: 14px;
+    }
+    
+    .order-status {
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    
+    .status-delivered {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-progress {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-preparing {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .order-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 20px;
+        padding: 15px 0;
+        border-top: 1px solid #e9ecef;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .order-total-price {
+        font-size: 22px;
+        font-weight: 800;
+        color: #e67e22;
+    }
+    
+    .track-btn {
+        background: #e67e22;
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .track-btn:hover {
+        background: #d35400;
+        transform: translateY(-2px);
+    }
+    
+    .empty-orders {
+        text-align: center;
+        padding: 80px;
+        background: #f8f9fa;
+        border-radius: 16px;
     }
 </style>
 
 @code {
-    private List<Order> orders = new();
+    private List<OrderDisplay> orders = new();
 
     protected override void OnInitialized()
     {
-        LoadSampleOrders();
-    }
-
-    private void LoadSampleOrders()
-    {
-        orders = new List<Order>
+        orders = new List<OrderDisplay>
         {
-            new Order 
-            { 
-                Id = 1001, 
-                Date = DateTime.Now.AddDays(-2).ToString("MMMM dd, yyyy"), 
-                ItemCount = 2, 
-                Total = 27998.00m, 
-                Status = "Delivered" 
-            },
-            new Order 
-            { 
-                Id = 1002, 
-                Date = DateTime.Now.AddDays(-1).ToString("MMMM dd, yyyy"), 
-                ItemCount = 3, 
-                Total = 44997.00m, 
-                Status = "On the Way" 
-            },
-            new Order 
-            { 
-                Id = 1003, 
-                Date = DateTime.Now.ToString("MMMM dd, yyyy"), 
-                ItemCount = 1, 
-                Total = 14999.00m, 
-                Status = "Preparing" 
-            }
+            new OrderDisplay { Id = 1001, Date = DateTime.Now.AddDays(-2).ToString("MMMM dd, yyyy"), ItemCount = 2, Total = 27998, Status = "Delivered" },
+            new OrderDisplay { Id = 1002, Date = DateTime.Now.AddDays(-1).ToString("MMMM dd, yyyy"), ItemCount = 3, Total = 44997, Status = "On the Way" },
+            new OrderDisplay { Id = 1003, Date = DateTime.Now.ToString("MMMM dd, yyyy"), ItemCount = 1, Total = 14985, Status = "Preparing" },
         };
     }
 
-    private string GetStatusColor(string status)
+    private string GetStatusClass(string status)
     {
         return status switch
         {
-            "Delivered" => "#27ae60",
-            "On the Way" => "#e67e22",
-            "Preparing" => "#3498db",
-            _ => "#666"
+            "Delivered" => "status-delivered",
+            "On the Way" => "status-progress",
+            "Preparing" => "status-preparing",
+            _ => ""
         };
+    }
+
+    private void GoToMenu()
+    {
+        NavigationManager.NavigateTo("/");
     }
 
     private void ViewOrder(int orderId)
     {
+        // This uses the route parameter!
         NavigationManager.NavigateTo($"/myorders/{orderId}");
     }
 
-    private class Order
+    private class OrderDisplay
     {
         public int Id { get; set; }
         public string Date { get; set; } = "";
